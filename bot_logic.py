@@ -92,10 +92,10 @@ def get_content_response():
     df.rename(columns={
         "mcn_map_location": "visioglobe"
     }, inplace=True)
-    df = df[['mcn_nid','mcn_ntype', 'mcn_content', 'visioglobe']]
     df['mcn_title_en'] = df['mcn_content'].apply(lambda x: x[0]["mcn_title"])
     df['description_en'] = df['mcn_content'].apply(lambda x: x[0]["mcn_body"])
     df['meta_tags'] = df['mcn_content'].apply(lambda x: x[0]["mcn_meta_tags"])
+    df = df[['mcn_nid','mcn_ntype','mcn_title_en','description_en','meta_tags','visioglobe']]
     df['location'] = df['visioglobe'].apply(get_concourse)
     df = df.query("mcn_ntype in ['shop','dine','relax','art','facilities','lounge','page','gates_and_belts']")
     df.to_csv("content_data.csv", index=False, encoding='utf-8')
@@ -159,6 +159,22 @@ def get_content_details(arguments):
     docs = search_docs(args['content_query'], top_k=3)
     return json.dumps(docs)
 
+def navigate_to_location(arguments):
+    # nodeID = json.loads(arguments)['navigate_query']
+    # return nodeID
+    args = json.loads(arguments)
+    query = args['navigate_query']
+    # Search for the best matching document
+    docs = search_docs(query, top_k=1)
+    # Extract mcn_nid from the best match
+    if docs:
+        # Each doc is a string like "mcn_nid ... mcn_ntype ... mcn_title_en ... etc"
+        doc_fields = docs[0].split(' ')
+        mcn_nid = doc_fields[0]  # Assuming mcn_nid is the first field
+        return f"mcn_nid: {mcn_nid}"
+    return "mcn_nid: Not found"
+
+
 # def get_location_details(arguments):
 #     visio_id = json.loads(arguments)['visio_query']
 #     qrcode_data = f'https://dohahamadairport.com/wayfinding/routecode/?dst={visio_id}&src=B01-UL001-IDA0379'
@@ -206,8 +222,10 @@ def run_conversation(messages, question):
             {
                 "name": "get_content_details",
                 "description" : f"""Current date and time: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}.
-                Use this fucntion when the user query is not relacted to flights. It can be related to shops, restaurants, facilities, lounges, gate location etc inside the airport.
-                Give a very short response to the user in less than 15 words. Do not specify location ids in the response.
+                Use this function when the user query is not related to flights. It can be related to shops, restaurants, art, facilities, lounges, gate location etc inside the airport.
+                The user should not be asking for direction or way to a particular location. If they do, only use the navigate_to_location function.
+                Only use this function when the user is asking for information other than directions for a particular shop, restaurant, art, lounge, facility etc.
+                Give a very short response to the user in less than 15 words. Do not specify mcn_nids or content type from csv file in the response.
                 Do not provide any other information unless the user asks for it.
                 """,
                 "parameters": {
@@ -215,13 +233,13 @@ def run_conversation(messages, question):
                     "properties": {
                         "content_query": {
                             "type": "string",
-                            "description": "This is keyword related to airport shop, dine, facilities etc to be searched. This cannot be a flight related keyword",
+                            "description": "This is keyword related to airport shop, dine, art, facilities etc to be searched. This cannot be a flight related keyword",
                         },
                         
                     },
                     "required": ["content_query"],
                 },
-            }
+            },
             # {
             #     "name": "get_location_details",
             #     "description" : f"""Current date and time: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}.
@@ -242,7 +260,29 @@ def run_conversation(messages, question):
             #         },
             #         "required": ["visio_query"],
             #     },
-            # }
+            # },
+            {
+                "name": "navigate_to_location",
+                "description" : f"""Current date and time: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}.
+                Always use this function if the customer asks the way to a shop, restaurant, art, lounge, facility or boarding gate 
+                or maybe generally asking for directions to a particular location.
+                Use the search function to get only mcn_nid from the content_data.csv file for the queried location.
+                Give back only mcn_nid in the response. Not the visioglobeID or location. This should be in the format mcn_nid: <value>.
+                """,
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "navigate_query": {
+                            "type": "string",
+                            "description": "This is the mcn_nid of the location that the user wants to navigate to.\
+                                It can be a shop, restaurant, art, lounge, facility or boarding gate.\
+                                Give back only associated mcn_nid of the location in the response. Not the visioglobeID or location. This should be in the format mcn_nid: <value>..",
+                        },
+                        
+                    },
+                    "required": ["navigate_query"],
+                },
+            }
         ],
         function_call="auto",
     )
@@ -253,18 +293,25 @@ def run_conversation(messages, question):
         available_functions = {
         # "get_flight_information": get_flight_information,
         "get_content_details": get_content_details,
+        "navigate_to_location": navigate_to_location,
         # "get_location_details": get_location_details
     }
         function_name = message.function_call.name
         function_to_call = available_functions[function_name]
         function_arguments = message.function_call.arguments
         function_response = function_to_call(function_arguments)
+        print("Function response:", function_response)
 
-        messages.append({"role": "system", "content": "Always answer in less than 30 words."})
-        messages.append({"role": "function","name": function_name,"content": function_response})
+        if "mcn_nid" in function_response:
+            return function_response
+        else:
+            messages.append({"role": "system", "content": f"""Always answer in less than 30 words.Always give me html formatted response as list wherever possible.
+                             Make title bold. Never give ids in the response.
+                             Always ask if the user wants help to get to any particular location. Important!"""})
+            messages.append({"role": "function","name": function_name,"content": function_response})
 
-        second_response = client.chat.completions.create(model=deployment, messages=messages)
-        return second_response
+            second_response = client.chat.completions.create(model=deployment, messages=messages)
+            return second_response
         
     return response
 
