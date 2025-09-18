@@ -270,7 +270,7 @@ def run_conversation(messages, question):
                 "description" : f"""Current date and time: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}.
                 Always use this function if the customer asks the way to a shop, restaurant, art, lounge, facility or boarding gate 
                 or maybe generally asking for directions to a particular location.
-                Use the search function to get only mcn_nid from the content_data.csv file for the queried location.
+                Use the search function to get only mcn_nid from the content_data.csv file for the queried location only once user confirms where they want to navigat to.
                 If the exact location isnt known use the get_content_details to figure out which location the user wants to go to.
                 Only when the location is known give back only mcn_nid in the response. Not the visioglobeID or location. This should be in the format mcn_nid: <value>.
                 """,
@@ -281,7 +281,7 @@ def run_conversation(messages, question):
                             "type": "string",
                             "description": "This is the mcn_nid of the location that the user wants to navigate to.\
                                 It can be a shop, restaurant, art, lounge, facility or boarding gate.\
-                                Only use this function when the user's desired location is known. Else ask to the name of location they would like to go to from given locations.\
+                                Only use this function when the user's desired location is known. Else ask the user for the name of location they would like to go to from given locations.\
                                 Give back only associated mcn_nid of the location in the response. Not the visioglobeID or location. This should be in the format mcn_nid: <value>..",
                         },
                         
