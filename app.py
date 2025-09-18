@@ -18,7 +18,12 @@ from flask import Flask, render_template, request, jsonify
 
 from bot_logic import run_conversation, messages
 
+from flask_cors import CORS
+
 app = Flask(__name__)
+
+# Flask
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # === Replace this function with your actual bot logic ===
 # def bot_logic(user_input, context=None):
