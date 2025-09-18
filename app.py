@@ -18,7 +18,7 @@ from flask import Flask, render_template, request, jsonify
 
 from bot_logic import run_conversation, messages
 
-from flask_cors import CORS
+# from flask_cors import CORS
 
 app = Flask(__name__)
 
