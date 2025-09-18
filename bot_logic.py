@@ -72,6 +72,10 @@ def get_concourse(visioIDs):
             locations.append("B concourse")
         if visioId.startswith("B01-UL001-IDC") or visioId.startswith("B01-UL002-IDC"):
             locations.append("C concourse")
+        if visioId.startswith("B01-UL001-IDD") or visioId.startswith("B01-UL002-IDD"):
+            locations.append("D concourse")
+        if visioId.startswith("B01-UL001-IDE") or visioId.startswith("B01-UL002-IDE"):
+            locations.append("E concourse")
         if visioId.startswith("B01-UL001-IDL") or visioId.startswith("B01-UL002-IDL"):
             locations.append("Landside")
         if visioId.startswith("B01-UL000"):
@@ -267,7 +271,8 @@ def run_conversation(messages, question):
                 Always use this function if the customer asks the way to a shop, restaurant, art, lounge, facility or boarding gate 
                 or maybe generally asking for directions to a particular location.
                 Use the search function to get only mcn_nid from the content_data.csv file for the queried location.
-                Give back only mcn_nid in the response. Not the visioglobeID or location. This should be in the format mcn_nid: <value>.
+                If the exact location isnt known use the get_content_details to figure out which location the user wants to go to.
+                Only when the location is known give back only mcn_nid in the response. Not the visioglobeID or location. This should be in the format mcn_nid: <value>.
                 """,
                 "parameters": {
                     "type": "object",
@@ -276,6 +281,7 @@ def run_conversation(messages, question):
                             "type": "string",
                             "description": "This is the mcn_nid of the location that the user wants to navigate to.\
                                 It can be a shop, restaurant, art, lounge, facility or boarding gate.\
+                                Only use this function when the user's desired location is known. Else ask to the name of location they would like to go to from given locations.\
                                 Give back only associated mcn_nid of the location in the response. Not the visioglobeID or location. This should be in the format mcn_nid: <value>..",
                         },
                         
@@ -307,7 +313,7 @@ def run_conversation(messages, question):
         else:
             messages.append({"role": "system", "content": f"""Always answer in less than 30 words.Always give me html formatted response as list wherever possible.
                              Make title bold. Never give ids in the response.
-                             Always ask if the user wants help to get to any particular location. Important!"""})
+                             Always ask if the user wants help to get to any their chosen location. Important!"""})
             messages.append({"role": "function","name": function_name,"content": function_response})
 
             second_response = client.chat.completions.create(model=deployment, messages=messages)
