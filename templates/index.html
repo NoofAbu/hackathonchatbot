@@ -183,6 +183,9 @@ background: linear-gradient(90deg,rgba(237, 20, 91, 1) 0%, rgba(209, 15, 79, 0.9
       if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.BOT_RESULT) {
         window.webkit.messageHandlers.BOT_RESULT.postMessage(result);
       }
+      const destination = encodeURIComponent(data.destination);
+      const type = encodeURIComponent(data.type);
+      window.location.href = `myapp://callback?type=${type}&destination=${destination}`;
       // Debug
       console.log("Sending to mobile:", result);
     }
