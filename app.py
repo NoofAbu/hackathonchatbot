@@ -42,6 +42,12 @@ app = Flask(__name__)
 #     bot_reply = bot_logic(user_input, context)
 #     return jsonify(bot_reply)
 
+@app.after_request
+def remove_blocking_headers(response):
+    response.headers.pop('X-Frame-Options', None)
+    response.headers['Content-Security-Policy'] = "frame-ancestors *;"
+    return response
+
 # # === API route for interacting with the bot ===
 @app.route("/get")
 def get_bot_response():    
