@@ -104,14 +104,25 @@ def get_content_response():
     df = df.query("mcn_ntype in ['shop','dine','relax','art','facilities','lounge','page','gates_and_belts']")
     df.to_csv("content_data.csv", index=False, encoding='utf-8')
 
+# def read_csv_into_vector_document(file, text_cols):
+#     with open(file, newline='') as csv_file:
+#         csv_reader = csv.DictReader(csv_file)
+#         text_data = []
+#         for row in csv_reader:
+#             text = ' '.join([str(row[col]) for col in text_cols])
+#             text_data.append(text)
+#         return [Document(page_content=text) for text in text_data]
+    
+
 def read_csv_into_vector_document(file, text_cols):
-    with open(file, newline='') as csv_file:
+    with open(file, newline='', encoding='utf-8') as csv_file:  # Specify UTF-8 encoding
         csv_reader = csv.DictReader(csv_file)
         text_data = []
         for row in csv_reader:
             text = ' '.join([str(row[col]) for col in text_cols])
             text_data.append(text)
         return [Document(page_content=text) for text in text_data]
+
 
 get_content_response()
 data = read_csv_into_vector_document("content_data.csv", [ 'mcn_nid','mcn_ntype','mcn_title_en','description_en','meta_tags','visioglobe','location'])
@@ -226,18 +237,22 @@ def run_conversation(messages, question):
             {
                 "name": "get_content_details",
                 "description" : f"""Current date and time: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}.
-                Use this function when the user query is not related to flights. It can be related to shops, restaurants, art, facilities, lounges, gate location etc inside the airport.
-                The user should not be asking for direction or way to a particular location. If they do, only use the navigate_to_location function.
-                Only use this function when the user is asking for information other than directions for a particular shop, restaurant, art, lounge, facility etc.
-                Give a very short response to the user in less than 15 words. Do not specify mcn_nids or content type from csv file in the response.
-                Do not provide any other information unless the user asks for it.
-                When listing multiple items (like shops, restaurants, or options), format the response as a numbered or bulleted list.  
-                After names, add a short description after a dash.  
-                Example format:
-                Here are the shops available:
-                - Bally : Luxury leather shoes, bags, and accessories
-                - Puma : Athletic and casual footwear
-                 - Coach : Designer bags and shoes """,
+                Use this function when the user query is not related to flights, such as shops, restaurants, art, facilities, lounges, gate locations, etc.
+                The user should not be asking for directions. If they do, use the navigate_to_location function. When the user asks for nearest ask where they are now.
+                Provide a short, concise response (under 15 words).
+                Do not specify mcn_nid or content type in the response.
+                Only provide the requested information.
+                When multiple results use given format for multiline Important !!:
+                - <Location Name> - <Location Description> <br>
+               """,
+                #   f"""Current date and time: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}.
+                # Use this function when the user query is not related to flights. It can be related to shops, restaurants, art, facilities, lounges, gate location etc inside the airport.
+                # The user should not be asking for direction or way to a particular location. If they do, only use the navigate_to_location function.
+                # Only use this function when the user is asking for information other than directions for a particular shop, restaurant, art, lounge, facility etc.
+                # Give a very short response to the user in less than 15 words. Never specify mcn_nids or content type from csv file in the response.
+                # Do not provide any other information unless the user asks for it.
+                # When listing multiple items (like shops, restaurants, or options), format the response as a list like <location name> - <location description> Important!!""",
+                    
                 "parameters": {
                     "type": "object",
                     "properties": {
