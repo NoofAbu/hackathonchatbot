@@ -231,7 +231,13 @@ def run_conversation(messages, question):
                 Only use this function when the user is asking for information other than directions for a particular shop, restaurant, art, lounge, facility etc.
                 Give a very short response to the user in less than 15 words. Do not specify mcn_nids or content type from csv file in the response.
                 Do not provide any other information unless the user asks for it.
-                """,
+                When listing multiple items (like shops, restaurants, or options), format the response as a numbered or bulleted list.  
+                After names, add a short description after a dash.  
+                Example format:
+                Here are the shops available:
+                - Bally – Luxury leather shoes, bags, and accessories
+                - Puma – Athletic and casual footwear
+                 - Coach – Designer bags and shoes """,
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -312,14 +318,6 @@ def run_conversation(messages, question):
             return function_response
         else:
             messages.append({"role": "system", "content": f"""Always answer in less than 30 words.
-                             When listing multiple items (like shops, restaurants, or options), format the response as a numbered or bulleted list.  
-                            Use bold for names, then add a short description after a dash.  
-                            At the end, ask a clear follow-up question.  
-                            Example format:
-                            Here are the shops available:
-                            - **Bally** – Luxury leather shoes, bags, and accessories
-                            - **Puma** – Athletic and casual footwear
-                            - **Coach** – Designer bags and shoes
                              Always ask if the user wants help to get to any their chosen location. Important!"""})
             messages.append({"role": "function","name": function_name,"content": function_response})
 
