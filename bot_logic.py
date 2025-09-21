@@ -311,8 +311,15 @@ def run_conversation(messages, question):
         if "mcn_nid" in function_response:
             return function_response
         else:
-            messages.append({"role": "system", "content": f"""Always answer in less than 30 words.Always give me html formatted response as list wherever possible.
-                             Make title bold. Never give ids in the response.
+            messages.append({"role": "system", "content": f"""Always answer in less than 30 words.
+                             When listing multiple items (like shops, restaurants, or options), format the response as a numbered or bulleted list.  
+                            Use bold for names, then add a short description after a dash.  
+                            At the end, ask a clear follow-up question.  
+                            Example format:
+                            Here are the shops available:
+                            - **Bally** – Luxury leather shoes, bags, and accessories
+                            - **Puma** – Athletic and casual footwear
+                            - **Coach** – Designer bags and shoes
                              Always ask if the user wants help to get to any their chosen location. Important!"""})
             messages.append({"role": "function","name": function_name,"content": function_response})
 
