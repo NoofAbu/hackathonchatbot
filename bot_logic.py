@@ -235,9 +235,9 @@ def run_conversation(messages, question):
                 After names, add a short description after a dash.  
                 Example format:
                 Here are the shops available:
-                - Bally – Luxury leather shoes, bags, and accessories
-                - Puma – Athletic and casual footwear
-                 - Coach – Designer bags and shoes """,
+                - Bally : Luxury leather shoes, bags, and accessories
+                - Puma : Athletic and casual footwear
+                 - Coach : Designer bags and shoes """,
                 "parameters": {
                     "type": "object",
                     "properties": {
