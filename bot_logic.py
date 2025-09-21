@@ -258,7 +258,7 @@ def run_conversation(messages, question):
                     "properties": {
                         "content_query": {
                             "type": "string",
-                            "description": "This is keyword related to airport shop, dine, art, facilities etc to be searched. This cannot be a flight related keyword",
+                            "description": "This is keyword related to airport shop, dine, art, facilities etc to be searched. This cannot be a flight related keyword. The ntype should correspond to the query.",
                         },
                         
                     },
