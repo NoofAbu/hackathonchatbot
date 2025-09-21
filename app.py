@@ -18,11 +18,13 @@ from flask import Flask, render_template, request, jsonify
 
 from bot_logic import run_conversation, messages
 
-# from flask_cors import CORS
+from flask_cors import CORS
 
 app = Flask(__name__)
 
 # CORS(app, resources={r"/*": {"origins": ["https://hackathonchatbot.azurewebsites.net/"]}})
+CORS(app, origins=["*"])  # Allow all origins or set a specific domain here
+
 
 # === Replace this function with your actual bot logic ===
 # def bot_logic(user_input, context=None):
@@ -42,10 +44,18 @@ app = Flask(__name__)
 #     bot_reply = bot_logic(user_input, context)
 #     return jsonify(bot_reply)
 
+# @app.after_request
+# def remove_blocking_headers(response):
+#     response.headers.pop('X-Frame-Options', None)
+#     response.headers['Content-Security-Policy'] = "frame-ancestors *;"
+#     return response
+
 @app.after_request
-def remove_blocking_headers(response):
+def add_header(response):
+    # Allow the web page to be embedded in an iframe
     response.headers["X-Frame-Options"] = "ALLOWALL"
-    response.headers['Content-Security-Policy'] = "frame-ancestors *;"
+    # Allow embedding from any source (adjust this to a specific domain if needed)
+    response.headers["Content-Security-Policy"] = "frame-ancestors *"
     return response
 
 # # === API route for interacting with the bot ===
