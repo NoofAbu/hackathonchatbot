@@ -174,6 +174,23 @@ background: linear-gradient(90deg,rgba(237, 20, 91, 1) 0%, rgba(209, 15, 79, 0.9
   </div>
 
   <script>
+    
+    function closeCustomTab() {
+        // Check if we are running in an Android environment
+      if (typeof Android !== 'undefined' && Android.closeTab) {
+        // Call the closeTab method defined in the Android app
+        Android.closeTab();
+      } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.closeTab) {
+        // If it's an iOS WebView environment, you could also have a way to close the tab
+        window.webkit.messageHandlers.closeTab.postMessage(null); // This sends a message to iOS WebView
+      } else {
+        // Log or show fallback if no Android or iOS method is found
+        console.log("Android or iOS WebView interface not found. Closing tab failed.");
+        // Optionally, you can manually redirect to close the tab by navigating
+        window.location.href = 'about:blank';  // Redirect to a blank page or use a custom URL scheme to close the app
+      }
+    }
+
     function sendResultToMobile(result) {
       // Android WebView
       if (window.AndroidBridge && window.AndroidBridge.onMessage) {
@@ -185,6 +202,9 @@ background: linear-gradient(90deg,rgba(237, 20, 91, 1) 0%, rgba(209, 15, 79, 0.9
       }
       const destination = encodeURIComponent(result.destination);
       const type = encodeURIComponent(result.type);
+      
+      closeCustomTab()
+
       window.location.href = `myapp://callback?type=${type}&destination=${destination}`;
       // Debug
       console.log("Sending to mobile:", result);
