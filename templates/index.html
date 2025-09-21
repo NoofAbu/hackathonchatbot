@@ -239,7 +239,9 @@ var navBtn = '<button class="nav_btn" onclick="sendResultToMobile({ type: \'NAVI
 
         } 
         else {
-          var botHtml = '<div class="botText"><div>' + data + '</div></div>';
+          // var botHtml = '<div class="botText"><div>' + data + '</div></div>';
+          var botHtml = '<div class="botText"><div>' + formatBotResponse(data) + '</div></div>';
+          
           $("#chatbox").append(botHtml);
         }
 
@@ -252,6 +254,40 @@ var navBtn = '<button class="nav_btn" onclick="sendResultToMobile({ type: \'NAVI
         getBotResponse();
       }
     });
+
+// Updated formatBotResponse to handle newlines and bold text properly
+function formatBotResponse(responseText) {
+  // Replace newlines with <br> to preserve line breaks
+  responseText = responseText.replace(/\n/g, '<br>');
+
+  // Parse the raw response text into individual shop items
+  const shopPattern = /-\s\*\*(.*?)\*\*\s-\s(.*?)(?=\s*-\s|\s*$)/g;
+  const matches = [...responseText.matchAll(shopPattern)];
+
+  let formattedResponse = ''; // To hold the final formatted HTML response
+
+  // Check if any shops are matched and format them
+  if (matches.length > 0) {
+    formattedResponse += '<ul style="list-style-type: none; padding-left: 0;">'; // Start the list
+
+    matches.forEach(match => {
+      // Formatting each shop item
+      formattedResponse += `
+        <li style="margin: 10px 0; padding: 5px; border-bottom: 1px solid #ddd;">
+          <span style="font-weight: bold; font-size: 1.2em;">${match[1]}</span><br>
+          <div style="font-style: italic; color: #555; margin-left: 20px;">${match[2]}</div>
+        </li>
+      `;
+    });
+
+    formattedResponse += '</ul>'; // Close the list
+  } else {
+    // If no matches, return the plain response text but handle bold formatting
+    formattedResponse = responseText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Handle bold
+  }
+
+  return formattedResponse;
+}
   </script>
 </body>
 </html>
