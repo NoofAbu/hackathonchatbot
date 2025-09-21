@@ -66,9 +66,10 @@
       justify-content: flex-start;
     }
 
-    .botText div {
-background: #ED145B;
-background: linear-gradient(90deg,rgba(237, 20, 91, 1) 0%, rgba(209, 15, 79, 0.99) 100%);
+    .botText .botTextContent {
+     
+      background: #ED145B;
+      background: linear-gradient(90deg,rgba(237, 20, 91, 1) 0%, rgba(209, 15, 79, 0.99) 100%);
       color: #fff;
       padding: 10px 14px;
       border-radius: 16px 16px 16px 0;
@@ -95,6 +96,7 @@ background: linear-gradient(90deg,rgba(237, 20, 91, 1) 0%, rgba(209, 15, 79, 0.9
       max-width: 60%;
       border-radius: 8px;
     }
+
     .input-area {
       display: flex;
       border-top: 1px solid #1e245e;
@@ -132,7 +134,7 @@ background: linear-gradient(90deg,rgba(237, 20, 91, 1) 0%, rgba(209, 15, 79, 0.9
 #header{ position:sticky; width:100%; background:#1e245e; color:#fff; padding:10px; text-align:left; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index:1000;}
 #header img{ height:80px;  margin-right:10px; float: left;}
 #header h1{ margin:0; padding:0; font-size:24px; font-weight:600; float: left; margin-top: 25px;}
-#chatbox{ margin-top:40px; margin-bottom:0px;}
+#chatbox{ margin-top:40px; margin-bottom:0px; padding-bottom:70px}
 /* Add to your <style> section */
 .nav_btn {
   background: linear-gradient(90deg, #27408b 0%, #1e245e 100%);
@@ -241,7 +243,7 @@ var navBtn = '<button class="nav_btn" onclick="sendResultToMobile({ type: \'NAVI
         } 
         else {
           // var botHtml = '<div class="botText"><div>' + data + '</div></div>';
-          var botHtml = '<div class="botText"><div>' + formatBotResponse(data) + '</div></div>';
+          var botHtml = '<div class="botText"><div class="botTextContent">' + formatBotResponse(data) + '</div></div>';
           
           $("#chatbox").append(botHtml);
         }
@@ -274,7 +276,7 @@ function formatBotResponse(responseText) {
     matches.forEach(match => {
       // Formatting each shop item
       formattedResponse += `
-        <li style="margin: 10px 0; padding: 5px; border-bottom: 1px solid #ddd;">
+        <li style="margin: 10px 0; padding: 5px; border-bottom: 1px solid #ddd;"> 
           <span style="font-weight: bold; font-size: 1.2em;">${match[1]}</span><br>
           <div style="font-style: italic; color: #555; margin-left: 20px;">${match[2]}</div>
         </li>
