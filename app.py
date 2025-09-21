@@ -44,7 +44,7 @@ app = Flask(__name__)
 
 @app.after_request
 def remove_blocking_headers(response):
-    response.headers.pop('X-Frame-Options', None)
+    response.headers["X-Frame-Options"] = "ALLOWALL"
     response.headers['Content-Security-Policy'] = "frame-ancestors *;"
     return response
 
