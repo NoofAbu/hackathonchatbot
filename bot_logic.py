@@ -174,18 +174,32 @@ def get_content_details(arguments):
     docs = search_docs(args['content_query'], top_k=3)
     return json.dumps(docs)
 
+# def navigate_to_location(arguments):
+#     # nodeID = json.loads(arguments)['navigate_query']
+#     # return nodeID
+#     args = json.loads(arguments)
+#     query = args['navigate_query']
+#     # Search for the best matching document
+#     docs = search_docs(query, top_k=1)
+#     # Extract mcn_nid from the best match
+#     if docs:
+#         # Each doc is a string like "mcn_nid ... mcn_ntype ... mcn_title_en ... etc"
+#         doc_fields = docs[0].split(' ')
+#         mcn_nid = doc_fields[0]  # Assuming mcn_nid is the first field
+#         return f"mcn_nid: {mcn_nid}"
+#     return "mcn_nid: Not found"
+
 def navigate_to_location(arguments):
-    # nodeID = json.loads(arguments)['navigate_query']
-    # return nodeID
     args = json.loads(arguments)
     query = args['navigate_query']
-    # Search for the best matching document
-    docs = search_docs(query, top_k=1)
-    # Extract mcn_nid from the best match
-    if docs:
-        # Each doc is a string like "mcn_nid ... mcn_ntype ... mcn_title_en ... etc"
-        doc_fields = docs[0].split(' ')
-        mcn_nid = doc_fields[0]  # Assuming mcn_nid is the first field
+    
+    # Find the row where mcn_nid equals the query
+    matching_docs = [doc for doc in data if query in doc.page_content]
+    
+    if matching_docs:
+        # Return the visioglobe ID
+        matched_doc = matching_docs[0]
+        mcn_nid = matched_doc.page_content.split(' ')[0]
         return f"mcn_nid: {mcn_nid}"
     return "mcn_nid: Not found"
 
@@ -345,9 +359,9 @@ def run_conversation(messages, question):
 # Main Loop
 # --------------------
 #uncomment to run file
-# while True:
-#     question = input("Say something: ")
-#     if question:
-#         returned = run_conversation(messages, question)
-#         answer = returned.choices[0].message.content
-#         print("Bot:", answer)
+while True:
+    question = input("Say something: ")
+    if question:
+        returned = run_conversation(messages, question)
+        answer = returned.choices[0].message.content
+        print("Bot:", answer)
