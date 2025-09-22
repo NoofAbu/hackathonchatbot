@@ -359,9 +359,9 @@ def run_conversation(messages, question):
 # Main Loop
 # --------------------
 #uncomment to run file
-while True:
-    question = input("Say something: ")
-    if question:
-        returned = run_conversation(messages, question)
-        answer = returned.choices[0].message.content
-        print("Bot:", answer)
+# while True:
+#     question = input("Say something: ")
+#     if question:
+#         returned = run_conversation(messages, question)
+#         answer = returned.choices[0].message.content
+#         print("Bot:", answer)
