@@ -194,24 +194,27 @@
       }
     }
 
-    function sendResultToMobile(result) {
-      // Android WebView
-      if (window.AndroidBridge && window.AndroidBridge.onMessage) {
-        window.AndroidBridge.onMessage(JSON.stringify(result));
-      }
-      // iOS WKWebView
-      if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.BOT_RESULT) {
-        window.webkit.messageHandlers.BOT_RESULT.postMessage(result);
-      }
-      const destination = encodeURIComponent(result.destination);
-      const type = encodeURIComponent(result.type);
-      
-      // closeCustomTab()
+  function sendResultToMobile(result) {
+    const destination = encodeURIComponent(result.destination);
+    const type = encodeURIComponent(result.type);
 
-      // window.location.href = `myapp://callback?type=${type}&destination=${destination}`;
-      // Debug
-      console.log("Sending to mobile:", result);
+    const isAndroidWebView = typeof AndroidBridge !== "undefined" && AndroidBridge.onMessage;
+    const isIOSWebView = window.webkit?.messageHandlers?.BOT_RESULT;
+
+    if (isAndroidWebView) {
+        // Send result to Android WebView
+        AndroidBridge.onMessage(JSON.stringify(result));
+        console.log("Sent to Android WebView:", result);
+    } else if (isIOSWebView) {
+        // Send result to iOS WKWebView
+        window.webkit.messageHandlers.BOT_RESULT.postMessage(result);
+        console.log("Sent to iOS WebView:", result);
+    } else {
+        // Not a WebView → assume Custom Tab or normal browser → use deep link
+        window.location.href = `myapp://callback?type=${type}&destination=${destination}`;
+        console.log("Sent via deep link:", result);
     }
+  }
 
     function getBotResponse() {
       var rawText = $("#textInput").val().trim();
